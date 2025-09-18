@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IAQA-ensine uma IA</title>
+<link rel="icon" type="image/png" href="https://github.githubassets.com/favicons/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    /* Reset básico e tipografia */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to right bottom, #6DD5ED, #2193B0); /* Gradiente de fundo */
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    /* Contêiner principal */
+    .container {
+        max-width: 650px;
+        width: 100%;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 20px; /* Bordas mais suaves */
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Sombra mais pronunciada */
+        display: flex;
+        flex-direction: column;
+        gap: 20px; /* Espaçamento entre seções */
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        color: #2193B0;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    h2 {
+        font-size: 1.4rem;
+        color: #444;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 8px;
+        font-weight: 500;
+    }
+
+    /* Chat */
+    #chat {
+        height: 320px;
+        overflow-y: auto;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 15px;
+        background: #fdfdfd;
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05); /* Sombra interna para profundidade */
+    }
+
+    .message {
+        margin: 0; /* Remove margens padrão */
+        padding: 10px 15px;
+        border-radius: 18px; /* Bordas mais arredondadas */
+        max-width: 75%;
+        word-wrap: break-word;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra para mensagens */
+    }
+
+    .user {
+        background: linear-gradient(to right, #6DD5ED, #2193B0); /* Gradiente para o usuário */
+        color: #fff;
+        margin-left: auto;
+        border-bottom-right-radius: 2px; /* Pequeno detalhe na borda */
+        text-align: right;
+    }
+
+    .ia {
+        background: linear-gradient(to right, #A8E063, #56AB2F); /* Gradiente para a IA */
+        color: #fff;
+        margin-right: auto;
+        border-bottom-left-radius: 2px; /* Pequeno detalhe na borda */
+        font-weight: 400;
+    }
+
+    /* Formulário e elementos interativos */
+    input[type="text"],
+    textarea,
+    select,
+    input[type="file"] { /* Adicionado input[type="file"] aqui */
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        padding: 12px 15px;
+        margin-top: 8px;
+        margin-bottom: 10px; /* Adiciona margem inferior */
+        border-radius: 10px;
+        border: 1px solid #d0d0d0;
+        width: 100%;
+        transition: all 0.3s ease;
+        background-color: #f8f8f8;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus,
+    input[type="file"]:focus { /* Adicionado input[type="file"] aqui */
+        border-color: #2193B0;
+        box-shadow: 0 0 0 3px rgba(33, 147, 176, 0.2);
+        outline: none;
+        background-color: #fff;
+    }
+
+    /* Estilo específico para input[type="file"] */
+    input[type="file"] {
+        padding-top: 10px; /* Ajusta o padding para o texto do arquivo */
+        padding-bottom: 10px;
+    }
+
+
+    button {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        padding: 12px 20px;
+        margin-top: 10px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+
+    button.primary {
+        background: linear-gradient(to right, #6DD5ED, #2193B0);
+        color: #fff;
+    }
+
+    button.primary:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(33, 147, 176, 0.3);
+    }
+
+    button.secondary {
+        background: #f0f0f0;
+        color: #555;
+        border: 1px solid #ccc;
+    }
+
+    button.secondary:hover {
+        background: #e0e0e0;
+        color: #333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    button.danger {
+        background: linear-gradient(to right, #FF7B7B, #FF4C4C);
+        color: #fff;
+    }
+
+    button.danger:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(255, 76, 76, 0.3);
+    }
+
+    button.download {
+        background: linear-gradient(to right, #FFD700, #DAA520); /* Exemplo de cor dourada */
+        color: #fff;
+    }
+
+    button.download:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
+    }
+
+    /* Layout de botões */
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .button-group button {
+        width: auto;
+        flex-grow: 1;
+        margin-top: 0; /* Remove margem superior dos botões no grupo */
+    }
+
+    /* Separador */
+    hr {
+        margin: 25px 0;
+        border: none;
+        border-top: 1px dashed #e0e0e0; /* Linha tracejada mais suave */
+    }
+
+    /* Detalhes */
+    p {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: #555;
+    }
+
+    strong {
+        color: #2193B0;
+        font-weight: 600;
+    }
+
+    /* Ajuda do script */
+    #scriptHelp {
+        display: none;
+        margin-top: 15px;
+        background: #f0f8ff; /* Fundo mais suave */
+        padding: 15px;
+        border-radius: 12px;
+        border: 1px solid #cee0f0;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #444;
+    }
+
+    #scriptHelp strong {
+        color: #2193B0;
+    }
+
+    #scriptHelp ul {
+        list-style-type: disc;
+        margin-left: 20px;
+        margin-top: 10px;
+    }
+
+    #scriptHelp li {
+        margin-bottom: 5px;
+    }
+
+    #scriptHelp pre {
+        background: #e9f5ff;
+        padding: 10px;
+        border-radius: 8px;
+        overflow-x: auto;
+        font-family: 'Consolas', 'Monaco', monospace;
+        color: #333;
+        margin-top: 10px;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+        body {
+            padding: 15px;
+            align-items: flex-start; /* Alinha no topo em telas menores */
+        }
+        .container {
+            padding: 20px;
+            border-radius: 15px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+        }
+        #chat {
+            height: 250px;
+            padding: 10px;
+            gap: 8px;
+        }
+        .message {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            max-width: 85%;
+        }
+        input[type="text"], textarea, select, button, input[type="file"] {
+            font-size: 0.9rem;
+            padding: 10px 12px;
+            border-radius: 8px;
+        }
+        .button-group {
+            flex-direction: column;
+            gap: 8px;
+        }
+        .button-group button {
+            width: 100%;
+        }
+        hr {
+            margin: 20px 0;
+        }
+    }
+
+    /* Animação de digitação */
+    .typing::after {
+        content: ' |';
+        animation: blink-caret .75s step-end infinite;
+    }
+    @keyframes blink-caret {
+        from, to { border-right-color: transparent }
+        50% { border-right-color: currentColor; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1><span style="color: #6DD5ED;">IA</span>QA-ensine uma IA</h1>
+
+    <section>
+        <h2>Definir nome da IA</h2>
+        <input type="text" id="aiNameInput" placeholder="Escolha um nome para sua IA">
+        <button onclick="setAIName()" class="primary">Definir nome</button>
+        <p>Nome atual da IA: <strong id="aiNameDisplay">Ana</strong></p>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Conversar com a IA</h2>
+        <div id="chat"></div>
+        <input type="text" id="userInput" placeholder="Escreva sua mensagem aqui...">
+        <button onclick="talk()" class="primary">Enviar mensagem</button>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Editar aprendizado existente</h2>
+        <select id="knowledgeSelect"></select>
+        <textarea id="editReply" placeholder="Nova resposta (use &lt;nome&gt; para o nome da IA)" rows="3"></textarea>
+        <div class="button-group">
+            <button onclick="updateKnowledge()" class="primary">Atualizar aprendizado</button>
+            <button onclick="deleteKnowledge()" class="danger">Apagar aprendizado</button>
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Importar aprendizado</h2> <!-- Título atualizado -->
+        <input type="file" id="scriptFileInput" accept=".txt"> <!-- Novo input de arquivo -->
+        <div class="button-group">
+            <button onclick="importScript()" class="primary">Importar aprendizado</button> <!-- Botão atualizado -->
+            <button onclick="showScriptHelp()" class="secondary">Como funciona?</button>
+        </div>
+
+        <div id="scriptHelp">
+            <strong>Como funciona o script:</strong> <!-- Título da ajuda atualizado -->
+            <ul>
+                <li>O script deve ser um arquivo <strong>.txt</strong>.</li>
+                <li>Cada regra deve estar no formato <code>&lt;R:mensagem&gt;&lt;P:resposta&gt;;</code>.</li>
+                <li>Finalize cada regra com <code>;</code>.</li>
+                <li>Exemplo de formato:
+                    <pre>&lt;R:ola&gt;&lt;P:oi! Como posso ajudar?&gt;;
+&lt;R:qual seu nome&gt;&lt;P:Meu nome é &lt;ia&gt;!&gt;;</pre>
+                </li>
+                <li>Use <code>&lt;ia&gt;</code> dentro da resposta para a IA usar seu próprio nome.</li>
+            </ul>
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+        <h2>Gerenciar Aprendizado</h2>
+        <button onclick="downloadKnowledge()" class="download">Baixar Aprendizado (.txt)</button>
+        <p>Isso fará o download de todo o aprendizado atual da IA em um arquivo de texto no formato de script.</p>
+    </section>
+
+</div>
+
+<script>
+    let knowledge = JSON.parse(localStorage.getItem('knowledge')) || {};
+    let aiName = localStorage.getItem('aiName') || "Ana";
+    const knowledgeSelect = document.getElementById('knowledgeSelect');
+    document.getElementById('aiNameDisplay').textContent = aiName;
+    updateSelectOptions();
+
+    let lastUserMessageKey = ""; // Guarda a chave em minúsculas da última mensagem do usuário
+
+    function setAIName() {
+        const name = document.getElementById('aiNameInput').value.trim();
+        if(name) {
+            aiName = name;
+            localStorage.setItem('aiName', aiName);
+            document.getElementById('aiNameDisplay').textContent = aiName;
+            alert(`Nome da IA definido para: ${aiName}`);
+            document.getElementById('aiNameInput').value = '';
+        }
+    }
+
+    async function talk() {
+        const input = document.getElementById('userInput').value.trim();
+        const chat = document.getElementById('chat');
+        if(!input) return;
+
+        // Adiciona a mensagem do usuário imediatamente
+        chat.innerHTML += `<div class="message user">Você: ${input}</div>`;
+        chat.scrollTop = chat.scrollHeight; // Rola para o final
+
+        let responseText;
+        const key = input.toLowerCase();
+
+        if(knowledge[key]) {
+            responseText = knowledge[key].replace(/<ia>/g, aiName);
+        } else {
+            let reply = prompt(`Eu não sei como responder a "${input}"!\nComo devo responder a isso? (Use <ia> para o nome da IA)`);
+            if(reply) {
+                knowledge[key] = reply;
+                localStorage.setItem('knowledge', JSON.stringify(knowledge));
+                updateSelectOptions();
+                responseText = reply.replace(/<ia>/g, aiName);
+            } else {
+                responseText = "Hmm, não aprendi nada novo dessa vez.";
+            }
+        }
+
+        // Verifica se a mensagem atual é a mesma que a anterior e não termina com '?'
+        if(key === lastUserMessageKey && !responseText.endsWith("?")) {
+            responseText += "?"; // Adiciona uma interrogação se for repetição
+        }
+
+        const iaDiv = document.createElement('div');
+        iaDiv.className = 'message ia';
+        iaDiv.innerHTML = `${aiName}: <span class="typing"></span>`;
+        chat.appendChild(iaDiv);
+        chat.scrollTop = chat.scrollHeight;
+
+        let i = 0;
+        const typingSpan = iaDiv.querySelector('.typing');
+        const interval = setInterval(() => {
+            if (i < responseText.length) {
+                typingSpan.textContent += responseText[i];
+                i++;
+            } else {
+                clearInterval(interval);
+                typingSpan.classList.remove('typing');
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }, 50);
+
+        lastUserMessageKey = key;
+        document.getElementById('userInput').value = '';
+    }
+
+    function updateSelectOptions() {
+        knowledgeSelect.innerHTML = '';
+        if (Object.keys(knowledge).length === 0) {
+            let defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "Nenhum aprendizado para editar";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            knowledgeSelect.appendChild(defaultOption);
+        } else {
+            for(let key in knowledge) {
+                let option = document.createElement('option');
+                option.value = key;
+                option.textContent = key;
+                knowledgeSelect.appendChild(option);
+            }
+        }
+        knowledgeSelect.onchange = function() {
+            if (this.value) {
+                document.getElementById('editReply').value = knowledge[this.value];
+            } else {
+                document.getElementById('editReply').value = '';
+            }
+        };
+        if (knowledgeSelect.options.length > 0 && knowledgeSelect.value) {
+             knowledgeSelect.dispatchEvent(new Event('change'));
+        } else {
+             document.getElementById('editReply').value = '';
+        }
+    }
+
+    function updateKnowledge() {
+        const selected = knowledgeSelect.value;
+        const newReply = document.getElementById('editReply').value.trim();
+        if(selected && newReply) {
+            knowledge[selected] = newReply;
+            localStorage.setItem('knowledge', JSON.stringify(knowledge));
+            alert("Aprendizado atualizado com sucesso!");
+            document.getElementById('editReply').value = '';
+            knowledgeSelect.dispatchEvent(new Event('change'));
+        } else if (!selected) {
+            alert("Por favor, selecione um aprendizado para atualizar.");
+        } else if (!newReply) {
+            alert("A nova resposta não pode ser vazia.");
+        }
+    }
+
+    function deleteKnowledge() {
+        const selected = knowledgeSelect.value;
+        if(selected && confirm(`Tem certeza que deseja apagar o aprendizado para "${selected}"?`)) {
+            delete knowledge[selected];
+            localStorage.setItem('knowledge', JSON.stringify(knowledge));
+            updateSelectOptions();
+            alert("Aprendizado apagado!");
+            document.getElementById('editReply').value = '';
+        } else if (!selected) {
+            alert("Por favor, selecione um aprendizado para apagar.");
+        }
+    }
+
+    // Função para importar script de um arquivo TXT
+    function importScript() { // Renomeado de loadScript
+        const fileInput = document.getElementById('scriptFileInput');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert("Por favor, selecione um arquivo .txt para importar.");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const scriptText = e.target.result;
+            const pattern = /<R:(.*?)><P:(.*?)>;/g;
+            let match;
+            let count = 0;
+            const newKnowledge = {};
+
+            while((match = pattern.exec(scriptText)) !== null) {
+                const userText = match[1].trim().toLowerCase();
+                const replyText = match[2].trim();
+                if(userText && replyText) {
+                    newKnowledge[userText] = replyText;
+                    count++;
+                }
+            }
+
+            if(count > 0) {
+                knowledge = { ...knowledge, ...newKnowledge };
+                localStorage.setItem('knowledge', JSON.stringify(knowledge));
+                updateSelectOptions();
+                alert(`Carregada(s) ${count} regra(s) de aprendizado do arquivo!`);
+            } else {
+                alert("Nenhuma regra válida encontrada no arquivo. Verifique o formato.");
+            }
+            fileInput.value = ''; // Limpa o input do arquivo
+        };
+        reader.onerror = function() {
+            alert("Erro ao ler o arquivo.");
+        };
+        reader.readAsText(file); // Lê o arquivo como texto
+    }
+
+    function showScriptHelp() {
+        const helpDiv = document.getElementById('scriptHelp');
+        helpDiv.style.display = helpDiv.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Função para baixar o aprendizado em formato de script
+    function downloadKnowledge() {
+        let content = '';
+        if (Object.keys(knowledge).length === 0) {
+            content = "# Não há aprendizado para baixar ainda.\n# Comece a ensinar a sua IA!";
+        } else {
+            // Formata o conhecimento no mesmo padrão de script para facilitar reuso
+            for (const key in knowledge) {
+                content += `<R:${key}><P:${knowledge[key]}>;\n`;
+            }
+        }
+
+        const filename = `iaqa_knowledge_${new Date().toISOString().slice(0,10)}.txt`;
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert("Aprendizado baixado com sucesso!");
+    }
+
+    // Inicializa o campo de edição de aprendizado se houver opções
+    if (knowledgeSelect.options.length > 0 && knowledgeSelect.value) {
+        document.getElementById('editReply').value = knowledge[knowledgeSelect.value];
+    }
+</script>
+
+</body>
+</html>
